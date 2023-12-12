@@ -168,6 +168,10 @@ namespace AzureSignTool
             {
                 return new ValidationResult("Cannot use '--azure-key-vault-managed-identity' and '--azure-key-vault-accesstoken' or '--azure-key-vault-client-id'", new[] { nameof(UseManagedIdentity) });
             }
+            if (AppendSignature && AuthenticodeTimestamp.Present)
+            {
+                return new ValidationResult("Cannot use '--append-signature' and '--timestamp-authenticode' options together.", new[] { nameof(AppendSignature), nameof(AuthenticodeTimestamp) });
+            }
             if (AllFiles.Count == 0)
             {
                 return new ValidationResult("At least one file must be specified to sign.");
