@@ -99,16 +99,24 @@ namespace AzureSign.Core
 
             if (appendSignature)
             {
-                flags |= SignerSignEx3Flags.SIG_APPEND;
-                if (_timeStampConfiguration.Type == TimeStampType.Authenticode)
+                if (!path.EndsWith(".dll".AsSpan(), StringComparison.InvariantCultureIgnoreCase) &&
+                    !path.EndsWith(".exe".AsSpan(), StringComparison.InvariantCultureIgnoreCase))
                 {
-                    // E_INVALIDARG is expected from SignerSignEx3.
-                    logger?.LogWarning("If you set the dwTimestampFlags parameter to SIGNER_TIMESTAMP_AUTHENTICODE, you cannot set the dwFlags parameter to SIG_APPEND.");
+                    logger?.LogWarning("SIG_APPEND is not supported for this file extention and will be ignored.");
                 }
-
-                if (!mssign32resolver.IsWindows11OrGreater)
+                else
                 {
-                    logger?.LogWarning("Loading windows 11 mssign32.dll from snapshot");
+                    flags |= SignerSignEx3Flags.SIG_APPEND;
+                    if (_timeStampConfiguration.Type == TimeStampType.Authenticode)
+                    {
+                        // E_INVALIDARG is expected from SignerSignEx3.
+                        logger?.LogWarning("If you set the dwTimestampFlags parameter to SIGNER_TIMESTAMP_AUTHENTICODE, you cannot set the dwFlags parameter to SIG_APPEND.");
+                    }
+
+                    if (!mssign32resolver.IsWindows11OrGreater)
+                    {
+                        logger?.LogWarning("Loading windows 11 mssign32.dll from snapshot");
+                    }
                 }
             }
 
